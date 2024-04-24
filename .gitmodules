@@ -1,0 +1,9 @@
+[submodule "smol"]
+	path = smol
+	url = https://github.com/colorchestra/smol
+[submodule "themes/smol"]
+	path = themes/smol
+	url = https://github.com/colorchestra/smol
+[submodule "themes/archie"]
+	path = themes/archie
+	url = https://github.com/athul/archie
