@@ -1,0 +1,14 @@
+{
+  "type" : "record",
+  "name" : "Author",
+  "fields" : [ {
+    "name" : "id",
+    "type" : {
+      "type" : "string",
+      "logicalType" : "uuid"
+    }
+  }, {
+    "name" : "nickname",
+    "type" : "string"
+  } ]
+}

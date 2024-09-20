@@ -1,0 +1,46 @@
+{
+  "type" : "record",
+  "name" : "Comment",
+  "fields" : [ {
+    "name" : "id",
+    "type" : {
+      "type" : "string",
+      "logicalType" : "uuid"
+    }
+  }, {
+    "name" : "message",
+    "type" : "string"
+  }, {
+    "name" : "locale",
+    "type" : {
+      "type" : "enum",
+      "name" : "Locale",
+      "symbols" : [ "en_US", "fr_FR", "zh_CN" ]
+    }
+  }, {
+    "name" : "author",
+    "type" : {
+      "type" : "record",
+      "name" : "Author",
+      "fields" : [ {
+        "name" : "id",
+        "type" : {
+          "type" : "string",
+          "logicalType" : "uuid"
+        }
+      }, {
+        "name" : "nickname",
+        "type" : "string"
+      } ]
+    }
+  }, {
+    "name" : "blog_id",
+    "type" : {
+      "type" : "string",
+      "logicalType" : "uuid"
+    }
+  }, {
+    "name" : "blog_title",
+    "type" : "string"
+  } ]
+}

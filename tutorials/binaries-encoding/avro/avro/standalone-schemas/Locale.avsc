@@ -1,0 +1,5 @@
+{
+  "type" : "enum",
+  "name" : "Locale",
+  "symbols" : [ "en_US", "fr_FR", "zh_CN" ]
+}

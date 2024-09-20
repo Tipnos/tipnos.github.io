@@ -5,7 +5,7 @@ googleAnalytics = "G-MX928QYSFW"
 languageCode = "en-us"
 copyright = "© Tristan Germain"
 
-paginate=3 # articles per page
+paginate=10 # articles per page
 
 [params]
 	mode="dark" 
