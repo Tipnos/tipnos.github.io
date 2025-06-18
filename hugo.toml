@@ -1,0 +1,45 @@
+baseURL = 'https://tristan.germain.com/'
+copyright = "© Tristan Germain"
+googleAnalytics = "G-MX928QYSFW"
+languageCode = "en-us"
+theme = "archie"
+title = 'Tristan Germain'
+
+pagination.pagerSize = 4 # articles per page
+
+[params]
+customcss = ["css/figure.css"]
+enableComments = true
+mode = "dark"
+subtitle = "Thanks to authors who shared their knowledge for free on the internet, I can overcome software development challenges. This website is my way of giving back. I’m writing about stuff I learnt along the way, which I hope brings something new to the table."
+useCDN = false
+
+[[params.social]]
+icon = "github"
+name = "GitHub"
+url = "https://github.com/Tipnos"
+
+[[params.social]]
+icon = "linkedin"
+name = "LinkedIn"
+url = "https://www.linkedin.com/in/tristan-germain-15784297/"
+
+[[menu.main]]
+name = "Home"
+url = "/"
+weight = 1
+
+[[menu.main]]
+name = "Posts"
+url = "/posts"
+weight = 2
+
+[[menu.main]]
+name = "About"
+url = "/posts/about"
+weight = 4
+
+[[menu.main]]
+name = "Tags"
+url = "/tags"
+weight = 5

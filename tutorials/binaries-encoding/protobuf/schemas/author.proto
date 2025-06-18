@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message Author {
+    optional bytes id = 1;
+    optional string nickname = 2;
+}

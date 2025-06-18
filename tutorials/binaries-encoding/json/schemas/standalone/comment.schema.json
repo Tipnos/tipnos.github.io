@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://localhost:8080/schemas/comment",
+  "type": "object",
+  "required": [
+    "id",
+    "message",
+    "locale",
+    "blog_id"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "author": {
+      "$ref": "/schemas/author"
+    },
+    "blog_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "blog_title": {
+      "type": "string"
+    },
+    "locale": {
+      "$ref": "/schemas/locale"
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "http://localhost:8080/schemas/author": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "http://localhost:8080/schemas/author",
+      "type": "object",
+      "required": [
+        "id",
+        "nickname"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "nickname": {
+          "type": "string"
+        }
+      }
+    },
+    "http://localhost:8080/schemas/locale": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "http://localhost:8080/schemas/locale",
+      "enum": [
+        "en_US",
+        "fr_FR",
+        "ze_CN"
+      ]
+    }
+  }
+}

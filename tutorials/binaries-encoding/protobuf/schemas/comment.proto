@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "locale.proto";
+import "author.proto";
+
+message Comment {
+    optional bytes id = 1;
+    optional string message = 2;
+    Author author = 3; // implicit presence not allowed, optional keyword not required
+    optional Locale locale = 4;
+    optional bytes blog_id = 5;
+    optional string blog_title = 6;
+}

@@ -1,0 +1,10 @@
+{
+    "$id": "http://localhost:8080/schemas/author",  
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object", 
+    "properties": {
+        "id": {"type": "string", "format": "uuid"},
+        "nickname": {"type": "string"}
+    },
+    "required": ["id", "nickname"]
+}

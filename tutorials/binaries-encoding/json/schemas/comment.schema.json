@@ -1,0 +1,14 @@
+{
+    "$id": "http://localhost:8080/schemas/comment",  
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object", 
+    "properties": {
+        "id": {"type": "string", "format": "uuid"},
+        "message": {"type": "string"},
+        "locale": {"$ref": "/schemas/locale"},
+        "author": {"$ref": "/schemas/author"},
+        "blog_id": {"type": "string", "format": "uuid"},
+        "blog_title": {"type": "string"}
+    },
+    "required": ["id", "message", "locale", "blog_id"]
+}

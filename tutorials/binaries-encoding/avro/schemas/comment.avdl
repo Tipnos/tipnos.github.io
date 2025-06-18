@@ -1,0 +1,16 @@
+import idl "locale.avdl";
+
+
+record Author {
+    uuid id;
+    string nickname;
+}
+
+record Comment {
+    uuid id;
+    string message;
+    Locale locale;
+    Author author; 
+    uuid blog_id;
+    string blog_title;
+}

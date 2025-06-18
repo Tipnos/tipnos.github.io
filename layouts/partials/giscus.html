@@ -1,0 +1,9 @@
+{{- if (eq (.Site.Params.enableComments | default false) true) -}}
+{{- if (eq (.Params.enableComments | default false) true) -}}
+<script src="https://giscus.app/client.js" data-repo="Tipnos/tipnos.github.io" data-repo-id="R_kgDOO93Drw"
+    data-category="General" data-category-id="DIC_kwDOO93Dr84CrqSK" data-mapping="pathname" data-strict="0"
+    data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme"
+    data-lang="en" crossorigin="anonymous" async>
+    </script>
+{{- end -}}
+{{- end -}}

@@ -1,0 +1,15 @@
+figure.floatright {
+    width: auto\9*0.3;
+    height: auto;
+    float: right;
+    margin-top: 6px;
+    margin-left: 10px;
+}
+
+figure.floatleft {
+    width: auto\9*0.3;
+    height: auto;
+    float: left;
+    margin-top: 6px;
+    margin-right: 10px;
+}

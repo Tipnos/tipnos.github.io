@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+enum Locale {
+    en_US = 0;
+    fr_FR = 1;
+    zh_CN = 2;
+}

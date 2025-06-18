@@ -1,0 +1,5 @@
+{
+    "$id": "http://localhost:8080/schemas/locale",  
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "enum": ["en_US", "fr_FR", "ze_CN"]
+}
