@@ -8,7 +8,7 @@ title = 'Tristan Germain'
 pagination.pagerSize = 4 # articles per page
 
 [params]
-customcss = ["css/figure.css"]
+customcss = ["css/figure.css", "css/list.css"]
 enableComments = true
 mode = "dark"
 subtitle = "Thanks to authors who shared their knowledge for free on the internet, I can overcome software development challenges. This website is my way of giving back. I’m writing about stuff I learnt along the way, which I hope brings something new to the table."
