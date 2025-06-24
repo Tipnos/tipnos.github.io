@@ -1,0 +1,11 @@
+li {
+    font-family: 'Fira Sans', sans-serif;
+}
+
+ul li {
+    text-indent: 2ch;
+}
+
+ul {
+    padding-left: 0ch;
+}
