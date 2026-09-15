@@ -1,7 +1,7 @@
 +++
-title = 'Binaries encoding - 3. Protobuf'
+title = 'Binary encoding - 3. Protobuf'
 date = 2024-11-07T18:04:25+02:00
-tags = ['Protobuf', 'event driven', 'event bus', 'binaries encoding']
+tags = ['Protobuf', 'event driven', 'event bus', 'binary encoding']
 description = 'Third post of the binary encoding technologies series. It presents how Protobuf can be used to encode messages stored in an event bus.'
 [params]
     enableComments = true
@@ -12,7 +12,7 @@ Third post of the binary encoding technologies series. It presents how Protobuf 
 As a reminder each technology is presented according to the following plan:
 
 - The key differentiation factors 
-- The available tooling by showing the implementation of an hypothetical blog post comment creation event:
+- The available tooling by showing the implementation of a hypothetical blog post comment creation event:
 
 ```json
 {
@@ -24,73 +24,73 @@ As a reminder each technology is presented according to the following plan:
         "nickname": "HAL 9000",
     },
     "blog_id": "b4e05776-fca3-485e-be48-b1758cedd792",
-    "blog_title": "Binaries encoding"
+    "blog_title": "Binary encoding"
 }
 ```
 - The ecosystem: quality of documentation and tooling, available resources etc.
 
->Note: This article is about the last revision of Protobuf at time of writing, proto 3.
+>Note: This article is about the last revision of Protobuf at the time of writing, proto 3.
 
 # Key differentiation factors
 
 ## Encoding algorithm
 
-The key differentiation factor of Protobuf is its [Tag-Length-Value](https://en.wikipedia.org/wiki/Type%E2%80%93length%E2%80%93value) (aka TVL) efficient encoding algorithm with specific behaviors for forward- and backward-compatibility across changes to messages definitions.
+The key differentiation factor of Protobuf is its [Tag-Length-Value](https://en.wikipedia.org/wiki/Type%E2%80%93length%E2%80%93value) (aka TLV) efficient encoding algorithm with specific behaviors for forward- and backward-compatibility across changes to messages definitions.
 
-A Protobuf message is a series of key-value pairs with keys being a number between 1 and 536,870,911 and the values one of the 6 defined [wire types](https://protobuf.dev/programming-guides/encoding/#structure). TVL's tag is the combination of the key number and value's wire type. 
+A Protobuf message is a series of key-value pairs. Each key is a number between 1 and 536,870,911, and each value uses one of the six defined [wire types](https://protobuf.dev/programming-guides/encoding/#structure). TLV's tag is the combination of the key number and value's wire type. 
 
-To serialize data structures of supported programming languages into its TVL format, Protobuf also defines `.proto types` which have a:
+To serialize data structures of supported programming languages into its TLV format, Protobuf also defines `.proto types` which have a:
 
-- one to one relation with programming language types
-- many to one relation with wire types
+- one-to-one relation with programming language types
+- many-to-one relation with wire types
  
 It means that several programming language types are encoded the same way (ie serialized to the same wire type).
 
 >Note: The protobuf spec defines two correlation tables for both relations: [programming language types](https://protobuf.dev/programming-guides/proto3/#scalar) and [wire types](https://protobuf.dev/programming-guides/encoding/#structure).
 
-Consequently to serialize a data structure, producers must assign for each attribute a unique number, called field number, which acts as an identifier. As during serialization attributes type information is lost (many to one relation), consumers must be aware of both the attribute field number and the proto type in order to properly deserialize messages.
+Consequently, to serialize a data structure, producers must assign a unique number, called the field number, to each attribute, which acts as an identifier. As attribute type information is lost during serialization (a many-to-one relation), consumers must be aware of both the attribute's field number and the proto type in order to properly deserialize messages.
 
-To be forward and backwards compatible, the Protobuf encoding algorithm does not provide any guarantee that any attribute will be present in a binary message. Consequently, consumers must manage their absence. Protobuf specification defines two [Field presence](https://protobuf.dev/programming-guides/field_presence/) behaviors that producers can choose from for each attribute:
-- Implicit presence: default value are not serialized. If not present it deserializes to the default value.  
+To be forward and backward compatible, the Protobuf encoding algorithm does not provide any guarantee that any attribute will be present in a binary message. Consequently, consumers must manage their absence. The Protobuf specification defines two [Field presence](https://protobuf.dev/programming-guides/field_presence/) behaviors that producers can choose from for each attribute:
+- Implicit presence: default values are not serialized. If not present it deserializes to the default value.  
 >Note: With this field presence behavior, consumers cannot make the difference between an unset value and a default value.
 - Explicit presence: explicitly set values are always serialized, even if it is the default value. Unset attributes are not serialized. Unset attributes are deserialized to the equivalent of `null` in the programming language.
 
->Note: Protobuf [specification defines](https://protobuf.dev/programming-guides/field_presence/#presence-in-proto3-apis) which proto types can have an implicit or explicit field presence. Specification also recommends to use explicit presence as much as possible.
+>Note: The Protobuf [specification defines](https://protobuf.dev/programming-guides/field_presence/#presence-in-proto3-apis) which proto types can have an implicit or explicit field presence. The specification also recommends using explicit presence as much as possible.
 
-Since the Protobuf binary format is a stream of tagged, self-delimiting values, by definition, it contains no information about unset values. Therefore, producers must provide to consumers field presence behavior for each attribute.
+Since the Protobuf binary format is a stream of tagged, self-delimiting values, by definition, it contains no information about unset values. Therefore, producers must communicate the field presence behavior to consumers for each attribute.
 
-The consequences of the Protobuf enconding algorithm is that consumers need a schema from producers to be able to deserialize their messages. To adress this issue the Protobuf specification defines a `.proto schema` described in the next section.
+The consequence of the Protobuf encoding algorithm is that consumers need a schema from producers to be able to deserialize their messages. To address this issue, the Protobuf specification defines a `.proto schema`, described in the next section.
 
->Note: Protobuf encoded messages can be partially decoded without schema for inspection. Partially means that initial proto types, field names and unset values can't be deducted.
+>Note: Protobuf-encoded messages can be partially decoded without a schema for inspection. Partially means that initial proto types, field names and unset values can't be deduced.
 
 >Note: The Protobuf specification also defines a [ProtoJSON format](https://protobuf.dev/programming-guides/json/) to share data with systems that do not support standard protobuf.
 
 ## Schema
 
-A Proto schema allows to define two custom types [Enumeration](https://protobuf.dev/programming-guides/proto3/#enum) and [Message](https://protobuf.dev/programming-guides/proto3/#simple). 
+A Proto schema allows you to define two custom types, [Enumeration](https://protobuf.dev/programming-guides/proto3/#enum) and [Message](https://protobuf.dev/programming-guides/proto3/#simple). 
 
-A message defines for each of attribute its:
+A message defines, for each of its attributes:
 - Proto type
 - Unique field number 
-- Field presence by (un)set the `optional` keyword
+- Field presence, set by (un)setting the `optional` keyword
 
-An Enumeration defines its predefined list of values with their field number. They also must have one default value. It must be the first element and have its field number set to 0.
+An Enumeration defines its predefined list of values with their field numbers. They also must have one default value. It must be the first element and have its field number set to 0.
 
 >Note: The default value is mandatory to enable implicit presence for enumeration.
 
-Additionaly .proto schema provides convenient tooling:
-- Package to prevent name clashes between custom types name 
+Additionally, .proto schema provides convenient tooling:
+- Package to prevent name clashes between custom types' names 
 - Import other schemas definition to allow breaking down schemas into logical units that reference each other
 - Reserved field numbers list to make sure producers do not reuse field numbers of deprecated fields.
 - Message type definition features: [Any](https://protobuf.dev/programming-guides/proto3/#any), [Oneof](https://protobuf.dev/programming-guides/proto3/#oneof), [Nested types](https://protobuf.dev/programming-guides/proto3/#nested)
 
->Note: Because protobuf encoded message doesn't store its schema version, reusing field numbers can have [severe consequences](https://protobuf.dev/programming-guides/proto3/#consequences) for backward and forward compatibility. 
+>Note: Because a protobuf-encoded message doesn't store its schema version, reusing field numbers can have [severe consequences](https://protobuf.dev/programming-guides/proto3/#consequences) for backward and forward compatibility. 
 
 # Available tooling
 
-Because of the Protobuf encoding algorithm intrisic complexity, developers can easily make mistakes while implementing serialization and deserialization from .proto schemas. Protobuf adresses this issue by relying on codegen for both producers and consumers. The Protobuf team maintains the [protoc CLI](https://github.com/protocolbuffers/protobuf/releases) to generate code in all supported programming languages. At time of writing, the Rust codegen is in experimental state. The best alternative is the [prost crate](https://crates.io/crates/prost).
+Because of the intrinsic complexity of Protobuf's encoding algorithm, developers can easily make mistakes while implementing serialization and deserialization from .proto schemas. Protobuf addresses this issue by relying on codegen for both producers and consumers. The Protobuf team maintains the [protoc CLI](https://github.com/protocolbuffers/protobuf/releases) to generate code in all supported programming languages. At the time of writing, the Rust codegen is in an experimental state. The best alternative is the [prost crate](https://crates.io/crates/prost).
 
-No schema registry is provided. Most of projects version schemas in a dedicated git respository so other team can import them as git submodule.
+No schema registry is provided. Most projects version schemas in a dedicated git repository so other teams can import them as a git submodule.
 
 ## Example .proto schemas
 
@@ -137,7 +137,7 @@ message Comment {
 }
 ```
 
->Note: There is optional keyword everywhere to follow the [protobuf recommandation](https://protobuf.dev/programming-guides/field_presence/#background) of having as much as possible explicit presence
+>Note: The `optional` keyword is used everywhere to follow the [protobuf recommendation](https://protobuf.dev/programming-guides/field_presence/#background) of having as much explicit presence as possible
 
 ## Example generated code
 
@@ -185,20 +185,20 @@ pub struct Comment {
 
 >Note: Prost explains in their [FAQ](https://github.com/tokio-rs/prost?tab=readme-ov-file#faq) why it is not possible to use serde.
 
-The important thing to notice is that every struct attributes are `Option`. It is one of the major constraint of the Protobuf encoding algorithm: consumers can never assume the presence of a field. Consequently, it means that consumers must handle cases which from a business logic perspective doesn't make sense (eg: the author attribute being `None`). Moreover they usually cannot perform business logic on generated code, but must first transform them to DTOs compliant with their business logic.
+The important thing to notice is that all struct attributes are `Option`. It is one of the major constraints of the Protobuf encoding algorithm: consumers can never assume the presence of a field. Consequently, it means that consumers must handle cases which from a business logic perspective don't make sense (eg: the author attribute being `None`). Moreover they usually cannot perform business logic on generated code, but must first transform them to DTOs compliant with their business logic.
 
-The major benefit is that schemas updates are extremely flexible. Producers can safely update them without any synchronization with consumers. Thus consumers are at anytime backward and forward compatible. They can catch updates at their own pace.
+The major benefit is that schema updates are extremely flexible. Producers can safely update them without any synchronization with consumers. Thus, consumers are at any time backward and forward compatible. They can catch updates at their own pace.
 
->Note: With implicit presence, scalar attributes (all of them except author) wouldn't be `Option`. But their default values would be equivalent of `Option::None` in explicit presence. Constraint would be the same but performing business logic on struct would be far less convenient and idiomatic.
+>Note: With implicit presence, scalar attributes (all of them except author) wouldn't be `Option`. But their default values would be equivalent to `Option::None` in explicit presence. Constraint would be the same but performing business logic on struct would be far less convenient and idiomatic.
 
->Rust code is available [in github](https://github.com/Tipnos/tipnos.github.io/tree/main/tutorials/binaries-encoding/protobuf)
+>Rust code is available [on GitHub](https://github.com/Tipnos/tipnos.github.io/tree/main/tutorials/binaries-encoding/protobuf)
 
 # Ecosystem
 
-The ecosystem is pretty simple as the protobuf team maintains everything themselves: documentation, tooling and libraries. Both are implemented for all mainstream programming languages except minor exception like rust being WIP at time of writing. 
+The ecosystem is pretty simple as the protobuf team maintains everything themselves: documentation, tooling and libraries. All of them are implemented for all mainstream programming languages, except for minor exceptions like Rust being WIP at the time of writing. 
 
-The official documentation is complete but require some efforts to understand the relatively complex protocol with all its counterintuitive, sometimes surprizing constraints and side effects.
+The official documentation is complete but requires some efforts to understand the relatively complex protocol with all its counterintuitive, sometimes surprising constraints and side effects.
 
-Finally Protobuf is a technology massively adopted, there is plenty of resources available to learn from.
+Finally, Protobuf is a massively adopted technology, and there are plenty of resources available to learn from.
 
-[Next and last post]({{< ref "4-conclusion" >}}) compares the 3 technologies and tries to identify in which situation they should be used. 
+[Next and last post]({{< ref "4-conclusion" >}}) compares the three technologies and tries to identify in which situations they should be used.

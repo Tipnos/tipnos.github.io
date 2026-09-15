@@ -54,7 +54,7 @@ async fn main() {
             nickname: "HAL 9000".to_string(),
         },
         blog_id: "b4e05776-fca3-485e-be48-b1758cedd792".parse().unwrap(),
-        blog_title: "Binaries encoding".to_string(),
+        blog_title: "Binary encoding".to_string(),
     };
     let mut buffer = Vec::new();
     SpecificSingleObjectWriter::<Comment>::with_capacity(10)
