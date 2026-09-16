@@ -1,18 +1,18 @@
 +++
-title = 'Binaries encoding - 2. JSON'
+title = 'Binary encoding - 2. JSON'
 date = 2024-10-01T18:04:25+02:00
-tags = ['JSON', 'Messagepack', 'JSON schema', 'event driven', 'event bus', 'binaries encoding']
-description = 'Second post of the binary encoding technologies series. It presents how together JSON, MessagePack and JSON schema can be used to encode messages stored in an event bus.'
+tags = ['JSON', 'Messagepack', 'JSON schema', 'event driven', 'event bus', 'binary encoding']
+description = 'Second post of the binary encoding technologies series. It presents how JSON, MessagePack and JSON schema can be used together to encode messages stored in an event bus.'
 [params]
     enableComments = true
 +++
 
-Second post of the binary encoding technologies series. It presents how together JSON, MessagePack and JSON schema can be used to encode messages stored in an event bus.
+Second post of the binary encoding technologies series. It presents how JSON, MessagePack and JSON schema can be used together to encode messages stored in an event bus.
 
 As a reminder each technology is presented according to the following plan:
 
 - The key differentiation factors 
-- The available tooling by showing the implementation of an hypothetical blog post comment creation event:
+- The available tooling by showing the implementation of a hypothetical blog post comment creation event:
 
 ```json
 {
@@ -24,7 +24,7 @@ As a reminder each technology is presented according to the following plan:
         "nickname": "HAL 9000",
     },
     "blog_id": "b4e05776-fca3-485e-be48-b1758cedd792",
-    "blog_title": "Binaries encoding"
+    "blog_title": "Binary encoding"
 }
 ```
 - The ecosystem: quality of documentation and tooling, available resources etc.
@@ -37,48 +37,48 @@ The key differentiation factor of MessagePack is how it combines a _schemaless_ 
 
 - Unlike JSON, it serializes to binary
 - Fine grained types to minimize value size as much as possible
-- Custom types (aka Extension types) to compensate disadvantages of ineffective serialization (eg: repeated data structures)
+- Custom types (aka Extension types) to compensate for the disadvantages of inefficient serialization (eg: repeated data structures)
 - Types are encoded
-- Specification doesn't define how to serialize object. The most common implementations are:
-  - Array (aka compact form): attributes order is used to match payload values. 
-  - Map: attributes name are encoded alongside value (like JSON).
+- The specification doesn't define how to serialize objects. The most common implementations are:
+  - Array (aka compact form): attribute order is used to match payload values. 
+  - Map: attribute names are encoded alongside values (like JSON).
 
->Note: The compact serialization form and the extension types feature are not suitable for data structure like events consumed by multiple services. Indeed both are fragile to change and introduce additional coupling between services at implementation level which, by the way, break the flexibility of a schemaless serialization format. 
+>Note: The compact serialization form and the extension types feature are not suitable for data structures like events consumed by multiple services. Indeed both are fragile to change and introduce additional coupling between services at the implementation level which, by the way, breaks the flexibility of a schemaless serialization format. 
 
 ## Schema: JSON Schema
 
-JSON schema is a declarative format for describing structured data in JSON format. Schemas are JSON objects but contrary to avro, they aren't meant to be used during serialization or deserialization. It's mainly used to document shared data structure by defining precise validation rules called [__subschema__](https://json-schema.org/learn/glossary#subschema).
+JSON schema is a declarative format for describing structured data in JSON format. Schemas are JSON objects but contrary to Avro, they aren't meant to be used during serialization or deserialization. It's mainly used to document shared data structure by defining precise validation rules called [__subschema__](https://json-schema.org/learn/glossary#subschema).
 
-JSON schema embraces the JSON philosophy by having limited types but extended validation rules for each of them. It makes it easy to use for simple cases but without limitation for complex one.
+JSON schema embraces the JSON philosophy by having limited types but extended validation rules for each of them. It makes it easy to use for simple cases but without limitation for complex ones.
 
 The specification defines in addition to JSON types:
 - Two [numeric types](https://json-schema.org/understanding-json-schema/reference/numeric) (instead of one in JSON): integer and number
 - [Enum](https://json-schema.org/understanding-json-schema/reference/enum)
 
-Below a bunch of noticeable validation rules by types:
+Below is a bunch of noticeable validation rules, by type:
 
 - Object: 
-  - Properties defined in a JSON schema are optional by default. A specific validation rule named [required properties](https://json-schema.org/understanding-json-schema/reference/object#required) must be defined for non optional properties.
+  - Properties defined in a JSON schema are optional by default. A specific validation rule named [required properties](https://json-schema.org/understanding-json-schema/reference/object#required) must be defined for non-optional properties.
   - By default a data structure is considered valid if it has properties not defined in its schema. This behavior can be changed by setting the specific keyword [additionalProperties](https://json-schema.org/understanding-json-schema/reference/object#additionalproperties) to false. 
 
->Note: The two object's default behaviors described above ease schema migration. Indeed thanks to this default behavior, a new version of data which only removed some properties and add new one, will still be valid against an older version of the schema.
+>Note: The two default behaviors of Object described above ease schema migration. Indeed, thanks to this default behavior, a new version of data which only removes some properties and adds new ones will still be valid against an older version of the schema.
 
 - Array: [Contains](https://json-schema.org/understanding-json-schema/reference/array#uniqueItems), [Length](https://json-schema.org/understanding-json-schema/reference/array#uniqueItems), [Uniqueness](https://json-schema.org/understanding-json-schema/reference/array#uniqueItems)
 - String: 
   - [Regular expressions](https://json-schema.org/understanding-json-schema/reference/string#regexp)
-  - [Built in formats](https://json-schema.org/understanding-json-schema/reference/string#built-in-formats): dates and times, ip adresses, uuid etc.
+  - [Built-in formats](https://json-schema.org/understanding-json-schema/reference/string#built-in-formats): dates and times, IP addresses, uuid etc.
 - Integer and number: [range](https://json-schema.org/understanding-json-schema/reference/numeric#range)
 
-To enable complex validation logic, JSON schema provides keywords to conditionnaly apply combination of validations rules:
+To enable complex validation logic, JSON schema provides keywords to conditionally apply combinations of validation rules:
 - [Composition](https://json-schema.org/understanding-json-schema/reference/combining)
   - allOf: AND
   - anyOf: OR
   - oneOf: XOR 
-- [Conditionals](https://json-schema.org/understanding-json-schema/reference/conditionals) allow to define custom conditions
+- [Conditionals](https://json-schema.org/understanding-json-schema/reference/conditionals) allow you to define custom conditions
 
-Finally, JSON schema provides keywords to break down schemas into logical units that reference each other as necessary. To do so it exists [schema identifier](https://json-schema.org/understanding-json-schema/structuring#schema-identification) which is a non-relative URI. Schema identifier can be used as [references](https://json-schema.org/understanding-json-schema/structuring#dollarref) in other schemas to avoid duplication. Schemas with references can be bundled to produce a standalone [Coumpond Schema Document](https://json-schema.org/understanding-json-schema/structuring#bundling) usable for validation. It is basically the original one with the referenced schemas appended at the end.
+Finally, JSON schema provides keywords to break down schemas into logical units that reference each other as necessary. To do so, there is the [schema identifier](https://json-schema.org/understanding-json-schema/structuring#schema-identification), a non-relative URI. Schema identifiers can be used as [references](https://json-schema.org/understanding-json-schema/structuring#dollarref) in other schemas to avoid duplication. Schemas with references can be bundled to produce a standalone [Compound Schema Document](https://json-schema.org/understanding-json-schema/structuring#bundling) usable for validation. It is basically the original one with the referenced schemas appended at the end.
 
->Note: JSON schema doesn't have any features dedicated to schema versioning or migration (eg: aliases, default values for required properties). It's a major difference compared to protobuf and avro. 
+>Note: JSON schema doesn't have any features dedicated to schema versioning or migration (eg: aliases, default values for required properties). It's a major difference compared to Protobuf and Avro. 
 
 The next section illustrates the key differentiation factors using available tooling.
 
@@ -86,7 +86,7 @@ The next section illustrates the key differentiation factors using available too
 
 ## MessagePack
 
-Not so much things to say on MessagePack Serialization and Deserialization. The crate `rmp_serde` is straight forward to use. One thing noticeable, it uses the compact form by default. To use the Map form you have to transform the default Serializer:
+Not much to say about MessagePack Serialization and Deserialization. The crate `rmp_serde` is straightforward to use. One thing noticeable, it uses the compact form by default. To use the Map form you have to transform the default Serializer:
 
 ```rust 
 let payload = Comment::default();
@@ -105,12 +105,12 @@ Deserialization code is the same whatever the type of serialization:
 let payload: Comment = rmp_serde::decode::from_slice(&buffer).unwrap();
 ```
 
->Note: JSON can be serialized to MessagePack format but without an optimum size. But the inverse is not true because the tranform function isn't bijective. For example UUID serializes to bytes in MessagePack.
+>Note: JSON can be serialized to MessagePack format but without optimal size. But the inverse is not true because the transform function isn't bijective. For example UUID serializes to bytes in MessagePack.
 
 ## JSON schema
 
-JSON Schema relies on its ecosystem to provide tooling. Its website maintains an up-to-date list of available tools in a [dedicated page](https://json-schema.org/tools?query=&sortBy=name&sortOrder=ascending&groupBy=toolingTypes&licenses=&languages=&drafts=&toolingTypes=&environments=). As JSON schema is widely adopted there is planty of them in a wide variety of mainstream languages. Below noticeable categories of tools:
-- Validators to validates JSON data against schemas
+JSON Schema relies on its ecosystem to provide tooling. Its website maintains an up-to-date list of available tools in a [dedicated page](https://json-schema.org/tools?query=&sortBy=name&sortOrder=ascending&groupBy=toolingTypes&licenses=&languages=&drafts=&toolingTypes=&environments=). As JSON schema is widely adopted, there are plenty of them in a wide variety of mainstream languages. Below noticeable categories of tools:
+- Validators to validate JSON data against schemas
 - Bundler to produce Compound Schema Document
 - Code to schema
 - Schema to code
@@ -118,13 +118,13 @@ JSON Schema relies on its ecosystem to provide tooling. Its website maintains an
 
 For the implementation of the hypothetical blog post comment creation event, the following tools were used:
 - A CLI bundler named  [jsonschema](https://github.com/sourcemeta/jsonschema)
-- A rust validator named (you guessed it) [jsonschema](https://crates.io/crates/jsonschema)
+- A Rust validator named (you guessed it) [jsonschema](https://crates.io/crates/jsonschema)
 
 ### Bundler
 
 The JSON schema version of the comment creation event looks like the following:
 
->JSON schema doesn't defined a file extension, but `.schema.json` is the one widely adopted. It is recognized by some IDEs (eg: VSCode).
+>JSON schema doesn't define a file extension, but `.schema.json` is the one widely adopted. It is recognized by some IDEs (eg: VSCode).
 
 locale.schema.json:
 
@@ -170,7 +170,7 @@ comment.schema.json:
 }
 ```
 
-With the CLI bundler command `jsonschema bundle schemas/comment.schema.json --resolve schemas | > schemas/standalone/comment.schema.json` it generates the Coumpound Schema Document below:
+With the CLI bundler command `jsonschema bundle schemas/comment.schema.json --resolve schemas > schemas/standalone/comment.schema.json` it generates the Compound Schema Document below:
 
 ```json
 {
@@ -198,14 +198,14 @@ With the CLI bundler command `jsonschema bundle schemas/comment.schema.json --re
 }
 ```
 
-> Note: As you can notice, Coumpound Schema Document is exactly the same as the source schema with the _$def_ keywork appended at the end.
+> Note: As you can see, the Compound Schema Document is exactly the same as the source schema with the `$defs` keyword appended at the end.
 >
->CLI can also resolve schemas using http (--http) instead of using a path (--resolve)
+>The CLI can also resolve schemas using http (--http) instead of using a path (--resolve)
 
 
 ### Validator
 
-The jsonschema crate is straight forward to use and can automatically resolve schema references and produce a Coumpound Schema Document. It supports natively resolve schema id URI in HTTP(s) and path references. Custom resolution can be performed by implementing the [`Retrieve`](https://docs.rs/jsonschema/0.26.1/jsonschema/trait.Retrieve.html) trait.
+The jsonschema crate is straightforward to use and can automatically resolve schema references and produce a Compound Schema Document. It natively supports resolving schema id URIs via HTTP(S) and path references. Custom resolution can be performed by implementing the [`Retrieve`](https://docs.rs/jsonschema/0.26.1/jsonschema/trait.Retrieve.html) trait.
 
 Testing data validation with natively supported references is straightforward:
 
@@ -222,18 +222,18 @@ assert!(jsonschema::validator_for(&comment_schema)
 
 _How should event producers and consumers use JSON schema validators?_
 
-Of course for consumers there is no benefit to validate data at runtime. For producers it's a bit different. Validate data with publicly available schema before publishing it ensures that consumers consume events in the format they expect. It prevents drift bugs between the public schema and the code producing it. Depending on performance requirement, it can be worth the overhead of the additional serialization to JSON and the validation.
+Of course, for consumers there is no benefit to validating data at runtime. For producers it's a bit different. Validating data against the publicly available schema before publishing it ensures that consumers consume events in the format they expect. It prevents drift bugs between the public schema and the code producing it. Depending on performance requirements, it can be worth the overhead of the additional serialization to JSON and the validation.
 
 Both consumers and producers should use property based testing on their DTOs to enforce they are compliant with publicly available JSON schemas.
 
->Rust code is available [in github](https://github.com/Tipnos/tipnos.github.io/tree/main/tutorials/binaries-encoding/json)
+>Rust code is available [on GitHub](https://github.com/Tipnos/tipnos.github.io/tree/main/tutorials/binaries-encoding/json)
 
 # Ecosystem
 
-JSON, JSON schema and MessagePack are technologies massively adopted. Thus the ecosystem is rich with tooling available in all mainstrem languages. Every tools I used are well maintained, documented and straight forward to use. 
+JSON, JSON schema and MessagePack are technologies massively adopted. Thus, the ecosystem is rich with tooling available in all mainstream languages. All the tools I used were well maintained, documented and straightforward to use. 
 
-The JSON schema documentation is top notch. Its format should be familiar to most developers because already used to work with similar format like OpenAPI. The format is easy to adopt and use because of how it is designed. Indeed its default behaviors are appropriated for shared data among multiple services. Only strongly typing object properties is a good start. Plus the ability to use HTTP URI as schema identifier and having tools supporting schema resolution out of the box makes it also easy to set up. 
+The JSON schema documentation is top notch. Its format should be familiar to most developers because they're already used to working with similar formats like OpenAPI. The format is easy to adopt and use because of how it is designed. Indeed, its default behaviors are appropriate for shared data among multiple services. Only strongly typing object properties is a good start. Plus the ability to use HTTP URI as schema identifier and having tools supporting schema resolution out of the box makes it also easy to set up. 
 
-Finally because the schema is not required for serialization, with the wide variety of tooling types available, each team can work as they are used to: code gen, bundling etc.
+Finally, because the schema is not required for serialization, with the wide variety of tooling types available, each team can work as they are used to: code gen, bundling etc.
 
-[Next post]({{< ref "3-protobuf" >}}) presents how Protobuf can be used to encode messages stored in an event bus. 
+[Next post]({{< ref "3-protobuf" >}}) presents how Protobuf can be used to encode messages stored in an event bus.

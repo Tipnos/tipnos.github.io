@@ -33,7 +33,7 @@ fn main() {
                 .as_bytes()
                 .to_vec(),
         ),
-        blog_title: Some("Binaries encoding".to_string()),
+        blog_title: Some("Binary encoding".to_string()),
     };
 
     let payload = comment.encode_to_vec();

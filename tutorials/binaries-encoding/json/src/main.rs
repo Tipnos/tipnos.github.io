@@ -25,7 +25,7 @@ impl Default for Comment {
                 nickname: "HAL 9000".to_string(),
             },
             blog_id: "b4e05776-fca3-485e-be48-b1758cedd792".parse().unwrap(),
-            blog_title: "Binaries encoding".to_string(),
+            blog_title: "Binary encoding".to_string(),
         }
     }
 }
@@ -137,7 +137,7 @@ async fn main() -> std::io::Result<()> {
 fn schema_validation() {
     let json = serde_json::json!(Comment::default());
 
-    // Validate with coumpound Schema Document
+    // Validate with compound Schema Document
     assert!(jsonschema::validator_for(&Comment::get_bundle_schema())
         .unwrap()
         .is_valid(&json));
