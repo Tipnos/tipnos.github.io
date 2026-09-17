@@ -58,9 +58,7 @@ To handle BUM traffic there is two options:
 - Head-end replication: the ingress VTEP itself make a separate unicast copy of the BUM packet for each remote VTEP in that VNI's flood list.
 - Routed multicast: the ingress VTEP maps each VNI to a multicast group in BGP and relies on PIM to replicate the packet efficiently at each fanout point in the network.
 
-Routed multicast is more performant because replication happens once, at the actual branching points of the tree, rather than entirely at the ingress. But it is a really complicated protocol that tends to appear mainly in larger-scale or bandwidth-sensitive designs where BUM volume genuinely justifies the added PIM complexity. Head-end replication scale effectively if BUM traffic is < 1%. Hopefully kubernetes CNI like Cilium is optimized to use BUM traffic as few as possible which should represents a huge part of the traffic.
-
-> Note: This must be confirmed with verified source as the < 1% and Cilium CNI BUM traffic comes from AI response.
+Routed multicast is more performant because replication happens once, at the actual branching points of the tree, rather than entirely at the ingress. But it is a really complicated protocol that tends to appear mainly in larger-scale or bandwidth-sensitive designs where BUM volume genuinely justifies the added PIM complexity. Head-end replication scale effectively if BUM traffic is a fairly low percentage of the trafic. Hopefully kubernetes CNI like Cilium is optimized to use BUM traffic as few as possible which should represents a huge part of the traffic.
 
 #### Routing
 
@@ -76,13 +74,13 @@ For Symmetric routing with FRR, it is configured once a VRF is associated to an 
 
 EVPN allows network information to overlap between tenants (e.g., IP addresses). But as spines (typically acting as route reflectors) aggregate routes from all leaves, their BGP tables could end up with structurally identical NLRIs advertised by different tenants. Since BGP has no native way to distinguish these as separate routes, it would treat them as duplicates of the same prefix, running best-path selection between them and discarding all but one — silently losing one tenant's reachability information.
 
-To solve this issue, EVPN uses a **Route Distinguisher (RD)** to make these otherwise identical routes unique within the BGP routing table. An RD is an eight-byte value added to every tenant-advertised route within the UPDATE message attribute **MP_REACH_NLRI**. RDs can be computed in different ways depending on the fabric configuration. In our case (EVPN/VXLAN), RDs are computed as follows:
+To solve this issue, EVPN uses a **Route Distinguisher (RD)** to make these otherwise identical routes unique within the BGP routing table. An RD is an eight-byte value included in every *EVPN NLRI*. It makes otherwise identical routes from different tenants or route origins distinguishable within the BGP table. RDs can be computed in different ways depending on the fabric configuration. In our case (EVPN/VXLAN), RDs are computed as follows:
 
 1. Type field (2 bytes) set to Type 1: Administrator subfield = 4-byte IPv4 address, Assigned Number subfield = 2 bytes
 1. Administrator: VTEP IP of the leaf advertising the route
 1. Assigned Number: a value tied to the VRF or VLAN's VNI
 
-A VNI is 24 bits (3 bytes) long, which doesn't fit directly into the RD's 2-byte Assigned Number field. Most NOSes provide a feature to auto-generate the Assigned Number using an internal sequential index assigned to each VNI in local learning order — meaning the same VNI can receive a different index (and therefore a different RD) on different leaves. The issue with relying on this is observability: performing a lookup in the BGP route table does not allow identifying which entry maps to which VNI (i.e., tenant). For example, it makes assessing whether a configuration transaction was successfully applied difficult, since doing so would require knowing every leaf switch's internal VNI index mapping. Consequently, when automation is in place, the preferred solution is to avoid relying on auto-generated RDs and instead have a central authority maintain the VNI → Assigned Number mapping table across the whole fabric.
+A VNI is 24 bits (3 bytes) long, which doesn't fit directly into the RD's 2-byte Assigned Number field. For example FRR provides a feature to auto-generate the Assigned Number using an internal sequential index assigned to each VNI in local learning order — meaning the same VNI can receive a different index (and therefore a different RD) on different leaves. The issue with relying on this is observability: performing a lookup in the BGP route table does not allow identifying which entry maps to which VNI (i.e., tenant). For example, it makes assessing whether a configuration transaction was successfully applied difficult, since doing so would require knowing every leaf switch's internal VNI index mapping. Consequently, when automation is in place, the preferred solution is to avoid relying on auto-generated RDs and instead have a central authority maintain the VNI → Assigned Number mapping table across the whole fabric.
 
 ### Route target
 
@@ -220,11 +218,11 @@ AS_PATH:   02 02 00 00 FD E8 00 00 FD E9
 
 Next-Hop:  0A 00 00 01 (10.0.0.1 — UNCHANGED, preserved only because
                          "neighbor Leaf2 next-hop-unchanged" is configured
-                         on the spine by default in FRR; without it, this would become the
+                         on the spine, without it, this would become the
                          spine's own IP, breaking VXLAN decap on Leaf2)
 
 Ext-Communities: RT 65001:10010, Encap VXLAN — PRESERVED only because
-                  "neighbor Leaf2 send-community extended" is configured by default in FRR;
+                  "neighbor Leaf2 send-community extended" is configured,
                   without it, the spine strips both communities on
                   re-advertisement across this eBGP hop, and Leaf2 would
                   receive the NLRI with no RT at all — making it
@@ -248,7 +246,7 @@ Leaf2's auto-derived import RT is `*:10010` (eBGP wildcard, per FRR's behavior).
   AS-Path: 65000 65001   RT: 65001:10010 (matched via *:10010 wildcard)
 ```
 
-This entry now drives the data plane: Leaf2 knows hostA (`00:11:11:11:11:01` / `10.10.10.11`) sits behind VTEP `10.0.0.1`, and will encapsulate traffic toward it using VXLAN, VNI 10010, destination underlay IP `10.0.0.1` — all derived purely from this one BGP UPDATE's contents.
+This entry now drives the data plane: Leaf2 knows hostA (`00:11:11:11:11:01` / `10.10.10.11`) sits behind VTEP `10.0.0.1`, and will encapsulate traffic toward it using VXLAN, VNI 10010, destination underlay IP `10.0.0.1` — all derived from the information carried by this BGP UPDATE, together with the existing reachability to the VTEP.
 
 #### Summary of what changed at each hop
 

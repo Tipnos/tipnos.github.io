@@ -14,7 +14,7 @@ This one explains how leaf switches manage local isolation between attached serv
 
 ## VRF
 
-The virtual routing and forwarding (VRF) is the network equipment's equivalent of Virtual Machine: a VRF is a logical isolated router. Most network operating system (NOS) like SONiC, Juniper or Cisco instantiates a "default" VRF and a "management" one (sometimes labeled "mgmt") when the equipment has a dedicated management ethernet port. Inter VRF communications is possible but not enabled by default with explicit configuration (as it's the case with two distinct network equipments). Consequently the VRF abstraction is the perfect fit on leaf switches to logically isolate each servers that belong to different tenant from each other. Binding servers to different VRFs is equivalent of having each server physically attached to different switches.
+The virtual routing and forwarding (VRF) is the network equipment's equivalent of Virtual Machine: a VRF is a logical isolated router. Most network operating system (NOS) like SONiC, Juniper or Cisco instantiates a "default" VRF and a "management" one (sometimes labeled "mgmt") when the equipment has a dedicated management ethernet port. Inter VRF communications is possible but not enabled by default with explicit configuration (as it's the case with two distinct network equipments). Consequently the VRF abstraction is the perfect fit on leaf switches to logically isolate each servers that belong to different tenant from each other. Binding servers to different VRFs provides the same routing isolation between them as if they were attached to separate routers.
 
 The VRF abstraction is used by leaf switches according to the following rules:
 
@@ -23,7 +23,7 @@ The VRF abstraction is used by leaf switches according to the following rules:
 
 ## VLAN
 
-Virtual lan (VLAN) protocol is a local area network broadcast domain that is partitioned and isolated in a virtual network at the data link layer: L2. Thorough VLAN is not mandatory to achieve tenant isolation when using VRF, it is required by most NOS when two port (or more) need to share the same L2 broadcast domain (same subnet and gateway IP) whenever they belong to the same leaf or are distributed through the fabric (EVPN l2vpn cf. [next article]({{< ref "4-distributed-multi-tenancy" >}})).
+A Virtual LAN (VLAN) is a mechanism for partitioning a Layer 2 network into separate broadcast domains. Thorough VLAN is not mandatory to achieve tenant isolation when using VRF, it is required by some NOS when two port (or more) need to share the same L2 broadcast domain (same subnet and gateway IP) whenever they belong to the same leaf or are distributed through the fabric (EVPN l2vpn cf. [next article]({{< ref "4-distributed-multi-tenancy" >}})).
 
 Consequently VLANs for local tenants isolation are configured with the following rules:
 
