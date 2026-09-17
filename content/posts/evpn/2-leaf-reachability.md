@@ -100,7 +100,7 @@ NLRI: 1.1.1.1/32
 
 ## Best-path
 
-A BGP instance computes the next-hop for each advertised routes via an algorithm called the **best-path**. It is computed when a new UPDATE message is received from one or more of its peers. BGP uses 8 metrics during the algorithm computation. Some of them are from the UPDATE message **Path Attributes** component, others are defined locally. The variables are:
+A BGP instance computes the next-hop for each advertised routes via an algorithm called the **best-path**. It is computed when a new UPDATE message is received from one or more of its peers. BGP uses a sequence of decision criteria to select the preferred path. Some are carried as **path attributes** in UPDATE messages, while others are local to the BGP implementation. The variables are:
 
 | Mnemotic   | BGP metric         |
 | ---------- | ------------------ |
@@ -113,7 +113,7 @@ A BGP instance computes the next-hop for each advertised routes via an algorithm
 | Every      | eBGP over iBGP     |
 | Night      | Nexthop IGP Cost   |
 
-In the data center, only two of these metrics are used: `locally originated` and `AS_PATH`. In other words, a prefix that is local to a node is preferred to one learned via BGP, and a shorter AS_PATH length route is preferred over a route with a longer AS_PATH length. If the AS_PATH lengths are equal, the paths are considered equal cost.
+For the routes considered in this architecture, the two relevant criteria are: `locally originated` and `AS_PATH`. In other words, a prefix that is local to a node is preferred to one learned via BGP, and a shorter AS_PATH length route is preferred over a route with a longer AS_PATH length. If the AS_PATH lengths are equal, the paths are considered equal cost.
 
 By default BGP implementation not only requires the AS_PATH lengths to be the same to be considered equal cost, but the individual ASNs in the AS_PATH must be identical. A specific knob (`bgp bestpath as-path multipath-relax` in FRR) must be turned on to relax this restriction and only uses the AS_PATH length in determining equal cost.
 
@@ -127,7 +127,7 @@ To enable leaves reachability between each other through the clos topology, ever
 To achieve this:
 
 - Each leaf switch must have assigned a unique IP address across the fabric
-- This IP address must be advertised on the leaf [multiple eBGP session](#ebgp-vs-ibgp) to reach every connected spines acting as route reflector (RR) which will further re-advertise them to its connected leaves.
+- This IP address must be advertised on the leaf [multiple eBGP session](#ebgp-vs-ibgp) to reach every connected spines which will further re-advertise them to its connected leaves.
 
 Thanks to the clos topology and the network configuration described previously: All leaves can reach each other via multiple paths and if one of them fails the system automatically redirect traffic to healthy remaining paths.
 
@@ -173,7 +173,7 @@ router bgp 65000
     timers bgp 3 9 # cf. Convergence time section: Keepalive and Hold timers
     bgp bestpath as-path multipath-relax # cf. Best-path section.
     neighbor ISL peer-group # neighbors peer-group definition to simpilfy configuration
-    neighbor ISL capability extended-nexthop # Advertise the support for RFC 5589: use of IPV6 RA for IP peering while advertising IPv4
+    neighbor ISL capability extended-nexthop # Advertise the support for RFC 8950: use of IPV6 RA for IP peering while advertising IPv4
     neighbor ISL bfd # cf. Convergence time section.
     neighbor ISL advertisement-interval 0 # cf. Convergence time section: Advertisement interval
     neighbor ISL remote-as external # cf. Best-path and ASN numbering scheme sections. ASNs are specified in the datacenter only for BGP's loop detection via AS_PATH. As each switch will connect to a different ASN we're in the case of an "external" connexion from a BGP perspective.
