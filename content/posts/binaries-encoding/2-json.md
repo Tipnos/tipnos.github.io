@@ -29,9 +29,9 @@ As a reminder each technology is presented according to the following plan:
 ```
 - The ecosystem: quality of documentation and tooling, available resources etc.
 
-# Key differentiation factors
+## Key differentiation factors
 
-## Encoding algorithm: MessagePack
+### Encoding algorithm: MessagePack
 
 The key differentiation factor of MessagePack is how it combines a _schemaless_ serialization format with performant serialization speed and size:
 
@@ -45,7 +45,7 @@ The key differentiation factor of MessagePack is how it combines a _schemaless_ 
 
 >Note: The compact serialization form and the extension types feature are not suitable for data structures like events consumed by multiple services. Indeed both are fragile to change and introduce additional coupling between services at the implementation level which, by the way, breaks the flexibility of a schemaless serialization format. 
 
-## Schema: JSON Schema
+### Schema: JSON Schema
 
 JSON schema is a declarative format for describing structured data in JSON format. Schemas are JSON objects but contrary to Avro, they aren't meant to be used during serialization or deserialization. It's mainly used to document shared data structure by defining precise validation rules called [__subschema__](https://json-schema.org/learn/glossary#subschema).
 
@@ -82,9 +82,9 @@ Finally, JSON schema provides keywords to break down schemas into logical units 
 
 The next section illustrates the key differentiation factors using available tooling.
 
-# Available tooling
+## Available tooling
 
-## MessagePack
+### MessagePack
 
 Not much to say about MessagePack Serialization and Deserialization. The crate `rmp_serde` is straightforward to use. One thing noticeable, it uses the compact form by default. To use the Map form you have to transform the default Serializer:
 
@@ -107,7 +107,7 @@ let payload: Comment = rmp_serde::decode::from_slice(&buffer).unwrap();
 
 >Note: JSON can be serialized to MessagePack format but without optimal size. But the inverse is not true because the transform function isn't bijective. For example UUID serializes to bytes in MessagePack.
 
-## JSON schema
+### JSON schema
 
 JSON Schema relies on its ecosystem to provide tooling. Its website maintains an up-to-date list of available tools in a [dedicated page](https://json-schema.org/tools?query=&sortBy=name&sortOrder=ascending&groupBy=toolingTypes&licenses=&languages=&drafts=&toolingTypes=&environments=). As JSON schema is widely adopted, there are plenty of them in a wide variety of mainstream languages. Below noticeable categories of tools:
 - Validators to validate JSON data against schemas
@@ -120,7 +120,7 @@ For the implementation of the hypothetical blog post comment creation event, the
 - A CLI bundler named  [jsonschema](https://github.com/sourcemeta/jsonschema)
 - A Rust validator named (you guessed it) [jsonschema](https://crates.io/crates/jsonschema)
 
-### Bundler
+#### Bundler
 
 The JSON schema version of the comment creation event looks like the following:
 
@@ -203,7 +203,7 @@ With the CLI bundler command `jsonschema bundle schemas/comment.schema.json --re
 >The CLI can also resolve schemas using http (--http) instead of using a path (--resolve)
 
 
-### Validator
+#### Validator
 
 The jsonschema crate is straightforward to use and can automatically resolve schema references and produce a Compound Schema Document. It natively supports resolving schema id URIs via HTTP(S) and path references. Custom resolution can be performed by implementing the [`Retrieve`](https://docs.rs/jsonschema/0.26.1/jsonschema/trait.Retrieve.html) trait.
 
@@ -228,7 +228,7 @@ Both consumers and producers should use property based testing on their DTOs to 
 
 >Rust code is available [on GitHub](https://github.com/Tipnos/tipnos.github.io/tree/main/tutorials/binaries-encoding/json)
 
-# Ecosystem
+## Ecosystem
 
 JSON, JSON schema and MessagePack are technologies massively adopted. Thus, the ecosystem is rich with tooling available in all mainstream languages. All the tools I used were well maintained, documented and straightforward to use. 
 
