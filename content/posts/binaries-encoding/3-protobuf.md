@@ -31,9 +31,9 @@ As a reminder each technology is presented according to the following plan:
 
 >Note: This article is about the last revision of Protobuf at the time of writing, proto 3.
 
-# Key differentiation factors
+## Key differentiation factors
 
-## Encoding algorithm
+### Encoding algorithm
 
 The key differentiation factor of Protobuf is its [Tag-Length-Value](https://en.wikipedia.org/wiki/Type%E2%80%93length%E2%80%93value) (aka TLV) efficient encoding algorithm with specific behaviors for forward- and backward-compatibility across changes to messages definitions.
 
@@ -65,7 +65,7 @@ The consequence of the Protobuf encoding algorithm is that consumers need a sche
 
 >Note: The Protobuf specification also defines a [ProtoJSON format](https://protobuf.dev/programming-guides/json/) to share data with systems that do not support standard protobuf.
 
-## Schema
+### Schema
 
 A Proto schema allows you to define two custom types, [Enumeration](https://protobuf.dev/programming-guides/proto3/#enum) and [Message](https://protobuf.dev/programming-guides/proto3/#simple). 
 
@@ -86,13 +86,13 @@ Additionally, .proto schema provides convenient tooling:
 
 >Note: Because a protobuf-encoded message doesn't store its schema version, reusing field numbers can have [severe consequences](https://protobuf.dev/programming-guides/proto3/#consequences) for backward and forward compatibility. 
 
-# Available tooling
+## Available tooling
 
 Because of the intrinsic complexity of Protobuf's encoding algorithm, developers can easily make mistakes while implementing serialization and deserialization from .proto schemas. Protobuf addresses this issue by relying on codegen for both producers and consumers. The Protobuf team maintains the [protoc CLI](https://github.com/protocolbuffers/protobuf/releases) to generate code in all supported programming languages. At the time of writing, the Rust codegen is in an experimental state. The best alternative is the [prost crate](https://crates.io/crates/prost).
 
 No schema registry is provided. Most projects version schemas in a dedicated git repository so other teams can import them as a git submodule.
 
-## Example .proto schemas
+### Example .proto schemas
 
 The Protobuf schema version of the comment creation event looks like the following:
 
@@ -139,7 +139,7 @@ message Comment {
 
 >Note: The `optional` keyword is used everywhere to follow the [protobuf recommendation](https://protobuf.dev/programming-guides/field_presence/#background) of having as much explicit presence as possible
 
-## Example generated code
+### Example generated code
 
 Locale:
 ```rust 
@@ -193,7 +193,7 @@ The major benefit is that schema updates are extremely flexible. Producers can s
 
 >Rust code is available [on GitHub](https://github.com/Tipnos/tipnos.github.io/tree/main/tutorials/binaries-encoding/protobuf)
 
-# Ecosystem
+## Ecosystem
 
 The ecosystem is pretty simple as the protobuf team maintains everything themselves: documentation, tooling and libraries. All of them are implemented for all mainstream programming languages, except for minor exceptions like Rust being WIP at the time of writing. 
 

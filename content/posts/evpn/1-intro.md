@@ -2,13 +2,13 @@
 title = 'Network multi-tenancy - 1. Intro'
 date = 2026-08-01T21:12:37+02:00
 tags = ['Network', 'EVPN', 'VXLAN', 'Multi-tenancy', 'Infrastructure', 'Cloud provider', 'Datacenter']
-description = "First post of a series that explains, from a software engineer's perspective, how network multi-tenancy can be achieved using EVPN/VXLAN."
+description = "First post of a series on a deep, software-engineer-oriented exploration of how a modern datacenter network provides multi-tenancy, starting from the physical topology and progressively explaining the protocols and mechanisms that make the system work."
 draft = true
 [params]
     enableComments = true
 +++
 
-This is the first post of a series that explains, from a software engineer's perspective, how network multi-tenancy can be achieved using EVPN/VXLAN.
+This is the first post of a series on a deep, software-engineer-oriented exploration of how a modern datacenter network provides multi-tenancy, starting from the physical topology and progressively explaining the protocols and mechanisms that make the system work.
 
 I had to train myself on the subject for unStack, a start-up I co-founded. I read many informative books like [`Cloud Native Data Center Networking`](https://www.oreilly.com/library/view/cloud-native-data/9781492045595/) by Dinesh G. Dutt. But, as these topics interest a restricted number of people, mostly composed of network engineers, deep technical books assume a way of reasoning about the technology which is quite different from software engineer's mental model. Moreover Network architectures tend to evolve by adding new protocols and extensions while preserving compatibility with existing infrastructure. As a result, modern datacenter networks combine technologies from different generations to achieve requirements that weren't necessarily part of their original design. 
 
@@ -21,7 +21,7 @@ It is assumed that the reader has an understanding of basic network concepts tau
 
 Now that the context is set, let's start with the technical stuff! An overview of the network topology most modern datacenters use: *the Clos topology*.
 
-# Clos topology
+## Clos topology
 
 Named after Charles Clos, it is a type of non-blocking, multistage switching network architecture first described in 1953, designed to minimize the number of crosspoints while maintaining high connectivity. For simplicity, this series uses a two-tier leaf-spine Clos. Larger datacenter networks can add additional tiers to scale the fabric further.
 
@@ -44,7 +44,7 @@ The important properties:
 1. **Predictability**: the hop count (the number of devices the traffic passes through) for any leaf reaching any other leaf or border leaf is constant across the entire network, providing predictable path length and simplifying capacity planning. It's no longer true with a 3-tier topology: some paths (that cross between pods) gain two extra hops.
 1. **Expandability**: capacity can be increased incrementally by adding leaves and, when necessary, spines without redesigning the entire topology.
 
-# Network multi-tenancy
+## Network multi-tenancy
 
 Network multi-tenancy is a networking design where multiple independent customers, teams, or organizations ("tenants") share the same physical network infrastructure while keeping their traffic and resources logically separated.
 
@@ -73,7 +73,7 @@ That's why it is heavily used by bare-metal cloud providers: it lets them provid
 At this point the reader should have enough understanding of both the system's topology and the main requirements it must meet. The next section describes, at a high level, how such a distributed system behaves, along with the network protocols involved at each step.
 
 
-# Protocols architecture overview
+## Protocols architecture overview
 
 Quick definitions of the protocols mentioned below:
 
@@ -83,7 +83,7 @@ Quick definitions of the protocols mentioned below:
 - **EVPN** (Ethernet VPN): a BGP extension that advertises L2 (MAC) and L3 (IP) tenant reachability as routes instead of relying on flood-and-learn. It acts as the control plane.
 - **VXLAN** (Virtual Extensible LAN): a data plane protocol that encapsulates L2 frames over an IP network, letting a single L2 segment span multiple leaves. It relies on a control plane, here EVPN, to know where to send that encapsulated traffic.
 
-## Leaf
+### Leaf
 
 Manage local L2 tenants servers and distributed multi-tenancy:
 
@@ -98,7 +98,7 @@ Manage local L2 tenants servers and distributed multi-tenancy:
    1. **Attached servers outbound**: Look up attached servers' packets and compute the destination, which is either a local tenant's server or another leaf. If it is another leaf, encapsulate the packet with its own VTEP IP as the source and the computed leaf's VTEP IP as the destination. _Protocols_: **VXLAN**.
    1. **Attached servers inbound**: For locally originating traffic, simply forward it; otherwise, decapsulate the packet and compute the local destination. _Protocol_: **VRF, VLAN, VXLAN**
 
-## Border leaf
+### Border leaf
 
 Connect the fabric to external networks (internet, inter-az, shared services):
 
@@ -113,7 +113,7 @@ Connect the fabric to external networks (internet, inter-az, shared services):
    1. **Fabric outbound**: Decapsulate packets from other leaves, perform a route look-up, and forward them to the proper gateway. _Protocols_: **VXLAN, VRF**
    1. **Fabric inbound**: Compute the destination leaf by performing a route look-up, and encapsulate the packets accordingly. _Protocols_: **VXLAN, VRF**
 
-## Spine
+### Spine
 
 Act as a route reflector (RR):
 
@@ -124,4 +124,4 @@ Act as a route reflector (RR):
 
 Also, two terms come up constantly in this space and are worth introducing now: the **underlay**, the plain IP network that gives every switch reachability to every other switch (no tenant awareness at all), and the **overlay**, the tenant-aware layer built on top of it that carries the actual L2/L3 reachability information and encapsulated tenant traffic. VXLAN defines how tenant traffic is encapsulated over the underlay. It does not define how switches discover where that traffic should be sent. EVPN provides this control plane by distributing tenant reachability information using BGP.
 
-End of the introduction! Enough concepts have been covered to understand each of the remaining articles of the series. Each one of them deep dives on one or a grouping of steps enumerated in the current section. The next one is about leaf reachability: how switches connected to the servers (leaves) and to external networks (border leaves) communicate with each other.
+End of the introduction! Enough concepts have been covered to understand each of the remaining articles of the series. Each one of them deep dives on one or a grouping of steps enumerated in the current section. The [next one]({{< ref "2-leaf-reachability" >}}) is about leaf reachability: how switches connected to the servers (leaves) and to external networks (border leaves) communicate with each other.

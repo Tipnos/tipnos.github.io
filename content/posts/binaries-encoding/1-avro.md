@@ -38,9 +38,9 @@ The final post compares the three technologies and tries to identify when each o
 
 Let's begin with Avro as it's the least popular and thus should require more focus. The presentation below is quite detailed because of the documentation not being straightforward for this use case. 
 
-# Key differentiation factors
+## Key differentiation factors
 
-## Encoding algorithm
+### Encoding algorithm
 
 The key differentiating feature of Avro is its minimalist encoding algorithm:
 
@@ -66,7 +66,7 @@ Basically, the single object encoding algorithm is (copied from the documentatio
 
 >Note: for the decoding process, Avro uses attribute `name` in schema to match against code base structure (or classes) attribute name.
 
-## Schema
+### Schema
 
 An Avro schema is a valid JSON object that defines __one and only one__ custom type, a [`Record`](https://avro.apache.org/docs/++version++/specification/#complex-types), Enum etc. A Record is the equivalent of a JSON object or a message in protobuf. Below is a bunch of noteworthy features:
 
@@ -81,9 +81,9 @@ An Avro schema is a valid JSON object that defines __one and only one__ custom t
 
 The next paragraph describes the available tooling through an example.
 
-# Available tooling
+## Available tooling
 
-## Schema management
+### Schema management
 
 Avro provides an [IDL](https://avro.apache.org/docs/++version++/idl-language/) (Interface Description Language) to ease schema management. It's less verbose than JSON and, above all, allows using types defined in other schemas. To generate a standalone JSON schema from IDL, the [IDL tool](https://dlcdn.apache.org/avro/) duplicates the definitions of external types and nests them. These features are fundamental when maintaining a complex schema by factoring out type definitions. 
 
@@ -185,7 +185,7 @@ Then each team could privately maintain their schema in IDL format. To release a
 
 Let's have a look at how to use the `Namespace` Avro schema in Rust using the official crate [apache-avro](https://crates.io/crates/apache-avro).
 
-## Rust implementation
+### Rust implementation
 
 Good news! The encoding/decoding implementation is compatible with `serde`! Structure can be described as we're used to with an implementation of the `AvroSchema` trait:
 
@@ -264,7 +264,7 @@ let comment: Comment = from_value(
 
 >Rust code is available [on GitHub](https://github.com/Tipnos/tipnos.github.io/tree/main/tutorials/binaries-encoding/avro)
 
-# Ecosystem
+## Ecosystem
 
 I had 0 knowledge of Avro before writing this article, below is my feedback on its ecosystem. 
 
