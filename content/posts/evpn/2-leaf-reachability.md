@@ -1,7 +1,7 @@
 +++
 title = 'Network multi-tenancy - 2. Leaf reachability'
 date = 2026-08-07T10:31:01+02:00
-tags = ['Network', 'EVPN', 'VXLAN', 'Multi-tenancy', 'Infrastructure', 'Cloud provider', 'Datacenter']
+tags = ['Network', 'EVPN', 'VXLAN', 'BGP', 'VRF', 'VLAN', 'Multi-tenancy', 'Infrastructure', 'Cloud provider', 'Datacenter']
 description = "Second post of a series on a deep, software-engineer-oriented exploration of how a modern datacenter network provides multi-tenancy, starting from the physical topology and progressively explaining the protocols and mechanisms that make the system work."
 draft = true
 [params]
@@ -228,4 +228,4 @@ router bgp 65011
 exit
 ```
 
-The next article is about leaf local tenants isolation:  how leaf switches manage local isolation between attached servers that belongs to different tenants.
+The [next article]({{< ref "3-local-tenants-isolation" >}}) is about leaf local tenants isolation: how leaf switches manage local isolation between attached servers that belongs to different tenants.
