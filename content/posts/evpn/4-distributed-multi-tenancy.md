@@ -3,7 +3,6 @@ title = 'Network multi-tenancy - 4. Distributed multi-tenancy'
 date = 2026-08-10T15:52:46+02:00
 tags = ['Network', 'EVPN', 'VXLAN', 'BGP', 'VRF', 'VLAN', 'Multi-tenancy', 'Infrastructure', 'Cloud provider', 'Datacenter']
 description = "Fourth post of a series on a deep, software-engineer-oriented exploration of how a modern datacenter network provides multi-tenancy, starting from the physical topology and progressively explaining the protocols and mechanisms that make the system work."
-draft = true
 [params]
     enableComments = true
 +++
