@@ -2,13 +2,13 @@
 title = 'Network multi-tenancy - 1. Intro'
 date = 2026-08-01T21:12:37+02:00
 tags = ['Network', 'EVPN', 'VXLAN', 'Multi-tenancy', 'Infrastructure', 'Cloud provider', 'Datacenter']
-description = "First post of a series that explains, from a software engineer's perspective, how network multi-tenancy can be achieved using EVPN/VXLAN."
+description = "First post of a series on a deep, software-engineer-oriented exploration of how a modern datacenter network provides multi-tenancy, starting from the physical topology and progressively explaining the protocols and mechanisms that make the system work."
 draft = true
 [params]
     enableComments = true
 +++
 
-This is the first post of a series that explains, from a software engineer's perspective, how network multi-tenancy can be achieved using EVPN/VXLAN.
+This is the first post of a series on a deep, software-engineer-oriented exploration of how a modern datacenter network provides multi-tenancy, starting from the physical topology and progressively explaining the protocols and mechanisms that make the system work.
 
 I had to train myself on the subject for unStack, a start-up I co-founded. I read many informative books like [`Cloud Native Data Center Networking`](https://www.oreilly.com/library/view/cloud-native-data/9781492045595/) by Dinesh G. Dutt. But, as these topics interest a restricted number of people, mostly composed of network engineers, deep technical books assume a way of reasoning about the technology which is quite different from software engineer's mental model. Moreover Network architectures tend to evolve by adding new protocols and extensions while preserving compatibility with existing infrastructure. As a result, modern datacenter networks combine technologies from different generations to achieve requirements that weren't necessarily part of their original design. 
 

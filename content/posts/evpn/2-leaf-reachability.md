@@ -2,13 +2,13 @@
 title = 'Network multi-tenancy - 2. Leaf reachability'
 date = 2026-08-07T10:31:01+02:00
 tags = ['Network', 'EVPN', 'VXLAN', 'Multi-tenancy', 'Infrastructure', 'Cloud provider', 'Datacenter']
-description = "Second post of a series that explains, from a software engineer's perspective, how network multi-tenancy can be achieved using EVPN/VXLAN."
+description = "Second post of a series on a deep, software-engineer-oriented exploration of how a modern datacenter network provides multi-tenancy, starting from the physical topology and progressively explaining the protocols and mechanisms that make the system work."
 draft = true
 [params]
     enableComments = true
 +++
 
-Second post of a series that explains, from a software engineer's perspective, how network multi-tenancy can be achieved using EVPN/VXLAN. It is strongly advised to read the [intro]({{< ref "1-intro" >}}) first if not familiar with concepts such as clos topology and network multi-tenancy.
+Second post of a series on a deep, software-engineer-oriented exploration of how a modern datacenter network provides multi-tenancy, starting from the physical topology and progressively explaining the protocols and mechanisms that make the system work. It is strongly advised to read the [intro]({{< ref "1-intro" >}}) first if not familiar with concepts such as clos topology and network multi-tenancy.
 
 This one explains how switches connected to the servers and external networks communicate among each other. This feature enables every behavior described in the [protocols architecture overview]({{< ref "1-intro#protocols-architecture-overview" >}}) except the one that:
 
